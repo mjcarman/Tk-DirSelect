@@ -1,8 +1,8 @@
 #===============================================================================
 # Tk/DirSelect.pm
 # Copyright (C) 2000-2001 Kristi Thompson   <kristi@kristi.ca>
-# Copyright (C) 2002-2004 Michael J. Carman <mjcarman@mchsi.com>
-# Last Modified: 10/22/2004 1:41PM
+# Copyright (C) 2002-2005 Michael J. Carman <mjcarman@mchsi.com>
+# Last Modified: 8/17/2005 9:35AM
 #===============================================================================
 # This is free software under the terms of the Perl Artistic License.
 #===============================================================================
@@ -10,6 +10,7 @@ BEGIN { require 5.004 }
 
 package Tk::DirSelect;
 use Cwd;
+use File::Spec;
 use Tk 800;
 require Tk::Frame;
 require Tk::BrowseEntry;
@@ -22,7 +23,7 @@ use base 'Tk::Toplevel';
 Construct Tk::Widget 'DirSelect';
 
 use vars qw'$VERSION';
-$VERSION = '1.09';
+$VERSION = '1.10';
 
 my %colors;
 my $isWin32;
@@ -100,10 +101,44 @@ sub Populate {
 			-browsecmd => [\&_browse, $w->{tree}],
 			-state     => 'readonly',
 		)->pack(-side => 'left', -fill => 'x', -expand => 1);
+
+		if ($Tk::VERSION >= 804) {
+			# widget is readonly, but shouldn't appear disabled
+			for my $e ($w->{drive}->Subwidget('entry')->Subwidget('entry')) {
+				$e->configure(-disabledforeground => $colors{-foreground});
+				$e->configure(-disabledbackground => $colors{-background});
+			}
+		}
 	}
 	else {
 		$f{drive}->destroy;
 	}
+
+	# right-click context menu
+	my $menu = $w->Menu(
+		-tearoff   => 0,
+		-menuitems => [
+			[qw/command ~New/,    -command => [\&_mkdir , $w]],
+			[qw/command ~Rename/, -command => [\&_rename, $w]],
+			[qw/command ~Delete/, -command => [\&_rmdir,  $w]],
+		],
+	);
+	$menu->bind('<FocusOut>' => sub {$menu->unpost});
+	$w->{tree}->bind('<Button-3>' => [\&_context, $menu, Ev('X'), Ev('Y')]);
+
+	# popup overlay for renaming directories
+	$w->{renameval} = undef;
+	$w->{popup}     = $w->Toplevel();
+	$w->{rename}    = $w->{popup}->Entry(
+		-relief       => 'groove',
+		-borderwidth  => 1,
+	)->pack(-fill => 'x', -expand => 1);
+	$w->{popup}->overrideredirect(1);
+	$w->{popup}->withdraw;
+	$w->{rename}->bind('<Escape>',          sub {$w->{renameval} = undef});
+	$w->{rename}->bind('<FocusOut>',        sub {$w->{renameval} = undef});
+	$w->{rename}->bind('<KeyPress-Return>', sub {$w->{renameval} = $w->{rename}->get});
+
 	return $w;
 }
 
@@ -120,7 +155,7 @@ sub Show {
 	my $focus = $w->focusSave;
 	my $grab  = $w->grabSave;
 
-	$dir = $cwd unless defined $dir;
+	$dir = $cwd unless defined $dir && -d $dir;
 	chdir($dir);
 
 	if ($isWin32) {
@@ -242,6 +277,153 @@ sub _drive {
 }
 
 
+#-------------------------------------------------------------------------------
+# Method  : _context
+# Purpose : Display the context menu
+# Notes   : 
+#-------------------------------------------------------------------------------
+sub _context {
+	my ($w, $m, $x, $y) = @_;
+	my $wy = $y - $w->rooty;
+	$w->selectionClear();
+	$w->selectionSet($w->nearest($wy));
+	$m->post($x, $y);
+	$m->focus;
+}
+
+
+#-------------------------------------------------------------------------------
+# Method  : _mkdir
+# Purpose : Create a new directory under the current selection
+# Notes   : 
+#-------------------------------------------------------------------------------
+sub _mkdir  {
+	my $w     = shift;
+	my $dt    = $w->{tree};
+	my ($sel) = $dt->selectionGet();
+
+	my $cwd  = Cwd::cwd();
+	if (chdir($sel)) {
+		my $base = 'NewDirectory';
+		my $name = $base;
+		my $i    = 1;
+
+		while (-d $name && $i < 1000) {
+			$name = $base . $i++;
+		}
+
+		unless (-d $name) {
+			if (mkdir($name)) {
+				_showdir($dt, $sel);
+				$dt->selectionClear();
+				$dt->selectionSet($sel . '/' . $name);
+				$w->_rename();
+			}
+			else {
+				$w->messageBox(
+					-title   => 'Unable to create directory',
+					-message => "The directory '$name' could not be created.\n$!",
+					-icon    => 'error',
+					-type    => 'OK',
+				);
+			}
+		}
+
+		chdir($cwd);
+	}
+	else {
+		warn "Unable to chdir() for mkdir() [$!]\n";
+	}
+}
+
+
+#-------------------------------------------------------------------------------
+# Method  : _rmdir
+# Purpose : Delete the selected directory
+# Notes   : 
+#-------------------------------------------------------------------------------
+sub _rmdir {
+	my $w     = shift;
+	my $dt    = $w->{tree};
+	my ($sel) = $dt->selectionGet();
+
+	my @path = File::Spec->splitdir($sel);
+	my $dir  = pop @path;
+	my $pdir = File::Spec->catdir(@path);
+
+	my $cwd  = Cwd::cwd();
+	if (chdir($pdir)) {
+		if (rmdir($dir)) {
+			_showdir($dt, $pdir);
+		}
+		else {
+			$w->messageBox(
+				-title   => 'Unable to delete directory',
+				-message => "The directory '$dir' could not be deleted.\n$!",
+				-icon    => 'error',
+				-type    => 'OK',
+			);
+		}
+		chdir($cwd);
+	}
+	else {
+		warn "Unable to chdir() for rmdir() [$!]\n";
+	}
+}
+
+#-------------------------------------------------------------------------------
+# Method  : _rename
+# Purpose : Rename the selected directory
+# Notes   : 
+#-------------------------------------------------------------------------------
+sub _rename {
+	my $w       = shift;
+	my $dt      = $w->{tree};
+	my $popup   = $w->{popup};
+	my $entry   = $w->{rename};
+	my ($sel)   = $dt->selectionGet();
+	my ($x, $y, $x1, $y1) = $dt->infoBbox($sel);
+
+	my @path = File::Spec->splitdir($sel);
+	my $dir  = pop @path;
+	my $pdir = File::Spec->catdir(@path);
+
+	$entry->delete(0, 'end');
+	$entry->insert(0, $dir);
+	$entry->selectionRange(0, 'end');
+	$entry->focus;
+
+	my $font  = ($entry->configure(-font))[4];
+	my $text  = 'ABCDEFGHIGKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ';
+	my $width = $entry->fontMeasure($font, $text) / length($text);
+	$entry->configure(-width => ($x1 - $x) / $width);
+
+	$popup->Post($dt->rootx + $x, $dt->rooty + $y);
+	$popup->waitVariable(\$w->{renameval});
+	$popup->withdraw;
+
+	if (defined $w->{renameval} && $w->{renameval} ne $dir) {
+		my $cwd  = Cwd::cwd();
+
+		if (chdir($pdir)) {
+			unless (rename($dir, $w->{renameval})) {
+				$w->messageBox(
+					-title   => 'Unable to rename directory',
+					-message => "The directory '$dir' could not be renamed.\n$!",
+					-icon    => 'error',
+					-type    => 'OK',
+				);
+			}
+			chdir($cwd);
+			_showdir($dt, $cwd); # rebrowse to update the display
+		}
+		else {
+			warn "Unable to chdir() for rename() [$!]\n";
+		}
+	}
+}
+
+
 1;
 
 __END__
@@ -261,7 +443,15 @@ Tk::DirSelect - Cross-platform directory selection widget.
 
 This module provides a cross-platform directory selection widget. For 
 systems running Microsoft Windows, this includes selection of local and 
-mapped network drives.
+mapped network drives. A context menu (right-click or E<lt>Button3E<gt>) 
+allows the creation, renaming, and deletion of directories while 
+browsing.
+
+Note: Perl/Tk 804 added the C<chooseDirectory> method which uses native 
+system dialogs where available. (i.e. Windows) If you want a native feel 
+for your program, you probably want to use that method instead --
+possibly using this module as a fallback for systems with older versions 
+of Tk installed.
 
 =head1 METHODS
 

@@ -16,6 +16,11 @@ To install this module type the following:
 
 CHANGES
 
+1.10 (2005-08-17)
+    * Under Tk v804+, make BrowseEntry not look disabled just because it's
+      readonly.
+    * Added context menu for creating, renaming and deleting directories.
+
 1.09 (2004-10-22)
     * Pass additional arguments to Show() on to Popup().
     * For Show() default the initial directory to cwd only when first argument
