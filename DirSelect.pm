@@ -2,7 +2,7 @@
 # Tk/DirSelect.pm
 # Copyright (C) 2000-2001 Kristi Thompson   <kristi@kristi.ca>
 # Copyright (C) 2002-2005 Michael J. Carman <mjcarman@mchsi.com>
-# Last Modified: 8/17/2005 9:35AM
+# Last Modified: 8/19/2005 9:42AM
 #===============================================================================
 # This is free software under the terms of the Perl Artistic License.
 #===============================================================================
@@ -23,7 +23,7 @@ use base 'Tk::Toplevel';
 Construct Tk::Widget 'DirSelect';
 
 use vars qw'$VERSION';
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 my %colors;
 my $isWin32;
@@ -415,7 +415,7 @@ sub _rename {
 				);
 			}
 			chdir($cwd);
-			_showdir($dt, $cwd); # rebrowse to update the display
+			_showdir($dt, $pdir); # rebrowse to update the display
 		}
 		else {
 			warn "Unable to chdir() for rename() [$!]\n";

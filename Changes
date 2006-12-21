@@ -1,5 +1,8 @@
 Revision history for Perl extension Tk::DirSelect.
 
+1.11 (2005-08-19)
+    * DirTree no longer resets to cwd after a rename.
+
 1.10 (2005-08-17)
     * Under Tk v804+, make BrowseEntry not look disabled just because it's
       readonly.
