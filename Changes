@@ -1,5 +1,10 @@
 Revision history for Perl extension Tk::DirSelect.
 
+1.05 (2004-05-20)
+	* First CPAN release.
+	* Added a patch for HList behavior changes around Tk 804.025. Corrects
+	  the problem where Show() returned an ARRAY ref instead of a string.
+
 1.04 (2004-05-19)
 	* Cleaned up guts (no longer recreates a DirTree for each drive change)
 	* Generate drive list upon display, not creation.

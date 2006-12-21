@@ -2,7 +2,7 @@
 # Tk/DirSelect.pm
 # Copyright (C) 2000-2001 Kristi Thompson   <kristi@kristi.ca>
 # Copyright (C) 2002-2004 Michael J. Carman <mjcarman@mchsi.com>
-# Last Modified: 5/19/2004 2:51PM
+# Last Modified: 5/20/2004 8:31AM
 #===============================================================================
 # This is free software under the terms of the Perl Artistic License.
 #===============================================================================
@@ -16,7 +16,7 @@ use base 'Tk::Toplevel';
 Construct Tk::Widget 'DirSelect';
 
 use vars qw'$VERSION';
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 my %colors;
 my $isWin32;
@@ -64,7 +64,7 @@ sub Populate {
 
 	$w->{tree} = $f{tree}->Scrolled('DirTree',
 		-scrollbars       => 'osoe',
-		-selectmode       => 'browse',
+		-selectmode       => 'single',
 		-ignoreinvoke     => 0,
 		-width            => 50,
 		-height           => 15,
@@ -148,6 +148,11 @@ sub Show {
 	chdir($cwd)                   # restore working directory
 		or warn "Could not chdir() back to '$cwd' [$!]\n";
 
+	# HList SelectionGet() behavior changed around Tk 804.025
+	if (ref $w->{dir} eq 'ARRAY') {
+		$w->{dir} = $w->{dir}[0];
+	}
+
 	{
 		local $^W;
 		$w->{dir} .= '/' if ($isWin32 && $w->{dir} =~ /:$/);
@@ -229,12 +234,11 @@ sub _drive {
 1;
 
 __END__
-
 =pod
 
-=head1 Tk::DirSelect
+=head1 NAME
 
-Cross-platform directory selection widget.
+Tk::DirSelect - Cross-platform directory selection widget.
 
 =head1 SYNOPSIS
 
