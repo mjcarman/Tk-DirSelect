@@ -16,17 +16,21 @@ To install this module type the following:
 
 CHANGES
 
+1.06 (2004-05-20)
+    * Add Tk as dependancy in Makefile.PL. Should be beyond obvious to
+      end users, but automated test sites aren't as smart. :)
+
 1.05 (2004-05-20)
-	* First CPAN release.
-	* Added a patch for HList behavior changes around Tk 804.025. Corrects
-	  the problem where Show() returned an ARRAY ref instead of a string.
+    * First CPAN release.
+    * Added a patch for HList behavior changes around Tk 804.025. Corrects
+      the problem where Show() returned an ARRAY ref instead of a string.
 
 1.04 (2004-05-19)
-	* Cleaned up guts (no longer recreates a DirTree for each drive change)
-	* Generate drive list upon display, not creation.
-	* Initial directory now an argument to Show() (not creation)
-	* Better display of initial directory.
-	* Changed title from default, allow user to set (at creation)
+    * Cleaned up guts (no longer recreates a DirTree for each drive change)
+    * Generate drive list upon display, not creation.
+    * Initial directory now an argument to Show() (not creation)
+    * Better display of initial directory.
+    * Changed title from default, allow user to set (at creation)
 
 1.03 (2004-05-19)
     * Maintenance taken over by Michael Carman.
@@ -38,6 +42,7 @@ CHANGES
 DEPENDENCIES
 
   Perl 5.004
+  Tk 800
   Win32API::File (under Microsoft Windows only)
 
 COPYRIGHT AND LICENCE
