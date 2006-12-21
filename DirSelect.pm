@@ -2,7 +2,7 @@
 # Tk/DirSelect.pm
 # Copyright (C) 2000-2001 Kristi Thompson   <kristi@kristi.ca>
 # Copyright (C) 2002-2004 Michael J. Carman <mjcarman@mchsi.com>
-# Last Modified: 5/21/2004 11:08AM
+# Last Modified: 10/22/2004 8:32AM
 #===============================================================================
 # This is free software under the terms of the Perl Artistic License.
 #===============================================================================
@@ -22,7 +22,7 @@ use base 'Tk::Toplevel';
 Construct Tk::Widget 'DirSelect';
 
 use vars qw'$VERSION';
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 my %colors;
 my $isWin32;
@@ -174,6 +174,12 @@ sub _browse {
 	$d = _drive($d) . '/';
 	chdir($d);
 	_showdir($w, $d);
+
+	# Workaround: Under Win* versions of Perl/Tk, scrollbars have a tendancy
+	# to show up but be disabled.
+	$w->yview(scroll => 1, 'units');
+	$w->update;
+	$w->yview(scroll => -1, 'units');
 }
 
 

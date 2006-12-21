@@ -1,5 +1,8 @@
 Revision history for Perl extension Tk::DirSelect.
 
+1.08 (2004-10-22)
+	* On Win32, added a work-around for scrollbars sometimes appearing disabled.
+
 1.07 (2004-05-21)
     * On Win32, added a work-around for inability to see other folders in the 
       root directory of the drive containing the initial directory. Reselecting 
