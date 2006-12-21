@@ -1,7 +1,13 @@
 Revision history for Perl extension Tk::DirSelect.
 
+1.09 (2004-10-22)
+    * Pass additional arguments to Show() on to Popup().
+    * For Show() default the initial directory to cwd only when first argument
+      is undef, not false. (Just in case someone actually has a directory
+      named '0')
+
 1.08 (2004-10-22)
-	* On Win32, added a work-around for scrollbars sometimes appearing disabled.
+    * On Win32, added a work-around for scrollbars sometimes appearing disabled.
 
 1.07 (2004-05-21)
     * On Win32, added a work-around for inability to see other folders in the 

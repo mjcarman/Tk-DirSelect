@@ -2,7 +2,7 @@
 # Tk/DirSelect.pm
 # Copyright (C) 2000-2001 Kristi Thompson   <kristi@kristi.ca>
 # Copyright (C) 2002-2004 Michael J. Carman <mjcarman@mchsi.com>
-# Last Modified: 10/22/2004 8:32AM
+# Last Modified: 10/22/2004 1:41PM
 #===============================================================================
 # This is free software under the terms of the Perl Artistic License.
 #===============================================================================
@@ -22,7 +22,7 @@ use base 'Tk::Toplevel';
 Construct Tk::Widget 'DirSelect';
 
 use vars qw'$VERSION';
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 my %colors;
 my $isWin32;
@@ -115,11 +115,12 @@ sub Populate {
 #-------------------------------------------------------------------------------
 sub Show {
 	my $w     = shift;
+	my $dir   = shift;
 	my $cwd   = cwd();
-	my $dir   = shift || $cwd;
 	my $focus = $w->focusSave;
 	my $grab  = $w->grabSave;
 
+	$dir = $cwd unless defined $dir;
 	chdir($dir);
 
 	if ($isWin32) {
@@ -139,7 +140,7 @@ sub Show {
 	# show initial directory
 	_showdir($w->{tree}, $dir);
 
-	$w->Popup();                  # show widget
+	$w->Popup(@_);                # show widget
 	$w->focus;                    # seize focus
 	$w->grab;                     # seize grab
 	$w->waitVariable(\$w->{dir}); # wait for user selection (or cancel)
@@ -274,13 +275,19 @@ The title for the widget can be set by specifying C<-title =E<gt>
 DirTree widget that displays directories, so be sure they're appropriate 
 (e.g. C<-width>)
 
-=head2 C<Show([directory])>
+=head2 C<Show([directory], [options])>
 
 Displays the DirSelect widget and returns the user selected directory or 
 C<undef> if the operation is canceled.
 
-Takes one optional argument -- the initial directory to display. If not 
-specified, the current directory will be used instead.
+All arguments are optional. The first argument (if defined) is the 
+initial directory to display. The default is to display the current 
+working directory. Any additional options are passed through to the 
+Popup() method. This means that you can do something like
+
+  $ds->Show(undef, -popover => $mw);
+
+to center the dialog over your application.
 
 =head1 DEPENDENCIES
 
