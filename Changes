@@ -1,0 +1,8 @@
+Revision history for Perl extension Tk::DirSelect.
+
+1.03 (2004-05-19)
+    * Maintenance taken over by Michael Carman.
+    * Use a BrowseEntry instead of buttons for Win32 drives
+    * Restores cwd after finished.
+    * Better passthrough of args to DirTree.
+    * Lots of miscellaneous tweaks.

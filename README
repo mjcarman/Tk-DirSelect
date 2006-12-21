@@ -1,0 +1,37 @@
+Tk/DirSelect
+============
+
+This module provides a cross-platform directory selection widget. For 
+systems running Microsoft Windows, this includes selection of local and 
+mapped network drives.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+CHANGES
+
+1.03 (2004-05-19)
+    * Maintenance taken over by Michael Carman.
+    * Use a BrowseEntry instead of buttons for Win32 drives
+    * Restores cwd after finished.
+    * Better passthrough of args to DirTree.
+    * Lots of miscellaneous tweaks.
+
+DEPENDENCIES
+
+  Perl 5.004
+  Win32API::File (under Microsoft Windows only)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2000-2001 Kristi Thompson   <kristi@kristi.ca>
+Copyright (C) 2002-2004 Michael J. Carman <mjcarman@mchsi.com>
+
+This library is free software under the terms of the Perl Artistic 
+License.
