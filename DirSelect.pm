@@ -2,7 +2,7 @@
 # Tk/DirSelect.pm
 # Copyright (C) 2000-2001 Kristi Thompson   <kristi@kristi.ca>
 # Copyright (C) 2002-2004 Michael J. Carman <mjcarman@mchsi.com>
-# Last Modified: 5/20/2004 8:31AM
+# Last Modified: 5/21/2004 11:08AM
 #===============================================================================
 # This is free software under the terms of the Perl Artistic License.
 #===============================================================================
@@ -10,13 +10,19 @@ BEGIN { require 5.004 }
 
 package Tk::DirSelect;
 use Cwd;
-use Tk::widgets qw'Frame BrowseEntry Button Label DirTree';
+use Tk 800;
+require Tk::Frame;
+require Tk::BrowseEntry;
+require Tk::Button;
+require Tk::Label;
+require Tk::DirTree;
+
 use strict;
 use base 'Tk::Toplevel';
 Construct Tk::Widget 'DirSelect';
 
 use vars qw'$VERSION';
-$VERSION = '1.05';
+$VERSION = '1.07';
 
 my %colors;
 my $isWin32;
@@ -128,14 +134,10 @@ sub Show {
 				$w->{selected_drive} = $d;
 			}
 		}
+	}
 
-		# show initial directory
-		_browse($w->{tree}, undef, $dir);
-	}
-	else {
-		# show initial directory
-		_showdir($w->{tree}, $dir);
-	}
+	# show initial directory
+	_showdir($w->{tree}, $dir);
 
 	$w->Popup();                  # show widget
 	$w->focus;                    # seize focus
@@ -169,7 +171,9 @@ sub Show {
 #-------------------------------------------------------------------------------
 sub _browse {
 	my ($w, undef, $d) = @_;
-	_showdir($w, _drive($d));
+	$d = _drive($d) . '/';
+	chdir($d);
+	_showdir($w, $d);
 }
 
 
@@ -277,6 +281,8 @@ specified, the current directory will be used instead.
 =over 4
 
 =item * Perl 5.004
+
+=item * Tk 800
 
 =item * Win32API::File (under Microsoft Windows only)
 

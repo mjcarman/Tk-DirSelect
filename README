@@ -16,6 +16,13 @@ To install this module type the following:
 
 CHANGES
 
+1.07 (2004-05-21)
+    * On Win32, added a work-around for inability to see other folders in the 
+      root directory of the drive containing the initial directory. Reselecting 
+      the drive from the drop menu now displays contents properly. (The root 
+      cause of the bug is in DirTree or one of its parent classes...)
+    * Fixed $VERSION in DirSelect.pm (Oops.)
+
 1.06 (2004-05-20)
     * Add Tk as dependancy in Makefile.PL. Should be beyond obvious to
       end users, but automated test sites aren't as smart. :)
