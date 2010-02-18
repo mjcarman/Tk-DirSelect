@@ -1,4 +1,7 @@
-Revision history for Perl extension Tk::DirSelect.
+Revision history for Tk-DirSelect
+
+1.12 (2010-02-17)
+    * Dual-licensed under Artistic 2.0 and GPL.
 
 1.11 (2005-08-19)
     * DirTree no longer resets to cwd after a rename.

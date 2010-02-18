@@ -1,10 +1,8 @@
 #===============================================================================
 # Tk/DirSelect.pm
-# Copyright (C) 2000-2001 Kristi Thompson   <kristi@kristi.ca>
-# Copyright (C) 2002-2005 Michael J. Carman <mjcarman@mchsi.com>
-# Last Modified: 8/19/2005 9:42AM
-#===============================================================================
-# This is free software under the terms of the Perl Artistic License.
+# Copyright (C) 2000-2001 Kristi Thompson <kristi@kristi.ca>
+# Copyright (C) 2002-2005,2010 Michael Carman <mjcarman@mchsi.com>
+# Last Modified: 2/16/2010
 #===============================================================================
 BEGIN { require 5.004 }
 
@@ -23,7 +21,7 @@ use base 'Tk::Toplevel';
 Construct Tk::Widget 'DirSelect';
 
 use vars qw'$VERSION';
-$VERSION = '1.11';
+$VERSION = '1.12';
 
 my %colors;
 my $isWin32;
@@ -491,12 +489,15 @@ to center the dialog over your application.
 
 =back
 
-=head1 AUTHOR
+=head1 LICENSE AND COPYRIGHT
 
-Original author Kristi Thompson <kristi@kristi.ca>
+Copyright 2000-2001 Kristi Thompson <kristi@kristi.ca>
+Copyright 2002-2005,2010 Michael Carman <mjcarman@cpan.org>
 
-Current maintainer Michael J. Carman <mjcarman@mchsi.com>
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
 
-This is free software under the terms of the Perl Artistic License.
+See http://dev.perl.org/licenses/ for more information.
 
 =cut
